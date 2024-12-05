@@ -74,11 +74,11 @@ def predict_sign_language():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-    
+
 def preprocess_video(video_path, target_fps=10):
     """
     Preprocess video by reducing its FPS and extracting frames.
-    
+
     :param video_path: Path to the input video
     :param target_fps: Target FPS to process the video
     :return: List of frames
@@ -86,27 +86,27 @@ def preprocess_video(video_path, target_fps=10):
     cap = cv2.VideoCapture(video_path)
     fps = cap.get(cv2.CAP_PROP_FPS)
     frame_interval = int(fps / target_fps) if fps > target_fps else 1
-    
+
     frames = []
     frame_count = 0
-    
+
     while cap.isOpened():
         ret, frame = cap.read()
         if not ret:
             break
-        
+
         if frame_count % frame_interval == 0:
             frames.append(frame)  # Save the frame for prediction
-        
+
         frame_count += 1
-    
+
     cap.release()
     return frames
 
 def preprocess_frame(frame):
     """
     Preprocess the input video frame for the model
-    
+
     :param frame: Numpy array of the video frame
     :return: Preprocessed numpy array
     """
@@ -114,13 +114,13 @@ def preprocess_frame(frame):
     img = img.resize((224, 224))
     img_array = image.img_to_array(img)
     img_array = np.expand_dims(img_array, axis=0)
-    img_array = img_array.astype('float32') / 255.0 
+    img_array = img_array.astype('float32') / 255.0
     return img_array
 
 def predict_frame(frame):
     """
     Predict the sign language for a single frame.
-    
+
     :param frame: Numpy array of the frame
     :return: Predicted alphabet and confidence
     """
@@ -139,14 +139,14 @@ def predict_sign_language_video():
     """
     if 'file' not in request.files:
         return jsonify({'error': 'No file uploaded'}), 400
-    
+
     file = request.files['file']
     video_path = "/tmp/temp_video.mp4"
     file.save(video_path)
 
     try:
         frames = preprocess_video(video_path, target_fps=10)
-        
+
         predictions = []
         confidences = []
 
@@ -170,14 +170,14 @@ def predict_sign_language_video():
 
         if current_count >= 7 and (not normalized_predictions or normalized_predictions[-1] != current_alphabet):
             normalized_predictions.append(current_alphabet)
-        
+
         average_confidence = np.mean(confidences)
 
         return jsonify({
             'predicted_alphabet': normalized_predictions,
             'confidence': average_confidence
         })
-    
+
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
