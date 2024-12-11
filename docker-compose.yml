@@ -6,16 +6,16 @@ services:
       dockerfile: Dockerfile
     container_name: genggam-makna-ml-api
     env_file:
-      - /opt/secrets/genggam-makna-ml-api.env
+      - /etc/secrets/genggam-makna-ml-api.env
     ports:
       - "4014:4014"
     networks:
-      - nginx
+      - nginx-mailcow-host
     volumes:
-      - /opt/secrets:/opt/secrets
+      - /etc/secrets:/etc/secrets
     command:
       ["python3", "./app.py"]
 
 networks:
-  nginx:
+  nginx-mailcow-host:
     external: true
