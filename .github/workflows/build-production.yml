@@ -1,4 +1,4 @@
-name: Production Build ML API GenggamMakna
+name: Production Build ML API Genggam Makna
 
 on:
   push:
